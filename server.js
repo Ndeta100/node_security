@@ -32,6 +32,7 @@ done(null, user)
 
 //Read the session from the cookie
 passport.deserializeUser((obj,done)=>{
+    
     done(dull, obj)
 })
 const secret=Math.floor(Math.random()*100)
@@ -45,7 +46,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 function checkLoggedIn(req,res,next){
    
-    const isLoggedIn=true
+    const isLoggedIn=req.isAuthenticated() && req.user
     if(!isLoggedIn){
        res.status(401).json({
            error:'You must log in!'
@@ -63,9 +64,10 @@ app.get('/auth/google/callback', passport.authenticate('google', {
 }), (req,res)=>{
   console.log('Google called us back')
 })
-app.get('/auth/logout',(req,res)=>[
-
-])
+app.get('/auth/logout',(req,res)=>{
+    req.logout()//Removes req.users and clears any logged in sessions
+    return res.redirect('/')
+})
 app.get('/secret',checkLoggedIn, (req,res)=>{
     res.send('Your secret number is ' +  secret)
 })
